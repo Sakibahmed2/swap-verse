@@ -1,6 +1,6 @@
-const GenreCard = ({ genre }) => {
+const SingleBookCard = ({ book }) => {
   return (
-    <div className="w-full max-w-[200px] h-[110px] bg-[#DEE7F5] p-3 rounded-[8px] flex justify-center items-center gap-3 ">
+    <div className="w-full h-[110px] bg-[#DEE7F5] p-3 rounded-[8px] flex justify-center items-center gap-3 ">
       <div>
         <svg
           width="19"
@@ -16,11 +16,11 @@ const GenreCard = ({ genre }) => {
         </svg>
       </div>
       <div className="">
-        <h4 className="text-sm font-medium">{genre.name || "Thriller"}</h4>
-        <p className="text-sm ">{genre.title || "Any of this genre"}</p>
+        <h4 className="text-sm font-medium">{book.title}</h4>
+        <p className="text-xs ">By {book.author}</p>
       </div>
     </div>
   );
 };
 
-export default GenreCard;
+export default SingleBookCard;

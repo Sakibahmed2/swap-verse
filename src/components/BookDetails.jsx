@@ -1,8 +1,13 @@
+/* eslint-disable no-unused-vars */
 import { useState } from "react";
+import bookBgImg from "../assets/book-bg.svg";
+import exchangeIcon from "../assets/icons/exchangeIcon.png";
 import BookCard from "./BookCard";
 import GenreCard from "./GenreCard";
-import OpenOfferCard from "./OpenOfferCard";
 import MoreBooksSection from "./MoreBooksSection";
+import OpenOfferCard from "./OpenOfferCard";
+import SingleBookCard from "./SingleBookCard";
+import { ArrowUp, ChevronLeft } from "lucide-react";
 
 const BookDetails = ({ bookData }) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
@@ -10,83 +15,48 @@ const BookDetails = ({ bookData }) => {
   const {
     title,
     author,
-    categories,
     description,
     condition,
     language,
-    location,
     owner,
-    positiveSwaps,
     swapCondition,
-    swapItems,
     genres,
-    coverImage,
-  } = bookData;
+    coverPhotoUrl,
+  } = bookData || {};
 
-  const getExchangeConditionTitle = () => {
-    switch (swapCondition) {
-      case "byBooks":
-      case "byBooksOne":
-        return "Swap only for these";
-      case "byGenres":
-        return "Swap only for these";
-      case "openForOffers":
-        return "Open to Offer";
-      default:
-        return "Exchange Condition";
-    }
-  };
-
-  const truncatedDescription =
-    description?.length > 120
-      ? `${description.substring(0, 120)}...`
-      : description;
-
-  const displayDescription = showFullDescription
-    ? description
-    : truncatedDescription;
+  const [swapConditionType, setSwapConditionType] = useState(
+    swapCondition?.conditionType || "ByBooks"
+  );
 
   return (
-    <div className="max-w-md mx-auto bg-white min-h-screen">
+    <div className="max-w-md mx-auto bg-slate-100 min-h-screen">
       {/* Header */}
-      <div className="p-4 flex items-center border-b">
+      <div className="p-4 flex items-center  bg-white">
         <button className="p-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
+          <ChevronLeft />
         </button>
-        <h1 className="text-center flex-1 font-medium">Book Details</h1>
+        <h1 className="text-center flex-1 ">Book Details</h1>
       </div>
 
       {/* Book Cover and Title */}
-      <div className="p-6 flex flex-col items-center">
-        <div className="w-32 h-44 bg-gray-200 mb-4 overflow-hidden">
+      <div className=" flex flex-col items-center w-full relative">
+        <img src={bookBgImg} alt="" className="absolute w-full" />
+        <div className="z-10 mt-16 ">
           <img
-            src={coverImage || "/placeholder.svg?height=200&width=150"}
+            src={coverPhotoUrl}
             alt={title}
-            className="w-full h-full object-cover"
+            className="w-[160px] h-[190px] object-cover "
           />
         </div>
-        <h2 className="text-xl font-semibold text-center">{title}</h2>
-        <p className="text-gray-600 text-center mt-1">by {author}</p>
+        <h2 className="text-xl font-semibold text-center mt-5">{title}</h2>
+        <p className=" text-center mt-1">by {author}</p>
 
         {/* Categories */}
         <div className="flex flex-wrap justify-center gap-2 mt-3">
-          {categories?.map((category, index) => (
+          {genres?.map((category, index) => (
             <span
               key={index}
-              className="text-xs text-gray-500 px-2 py-1 bg-gray-100 rounded"
+              className={`text-xs  px-2  ${index % 2 === 0 ? "border-x" : ""}`}
             >
               {category}
             </span>
@@ -95,33 +65,36 @@ const BookDetails = ({ bookData }) => {
       </div>
 
       {/* Exchange Condition */}
-      <div className="bg-gray-100 p-4">
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="font-medium">Exchange Condition</h3>
-          <span className="text-sm text-gray-500">
-            {getExchangeConditionTitle()}
-          </span>
+      <div className="bg-slate-100 p-4 mt-8 ">
+        <div className="flex flex-col justify-center items-center">
+          <img src={exchangeIcon} alt="" />
+          <p className="mt-2 mb-1 ">Exchange condition</p>
+          <span className="text-sm text-gray-500"></span>
         </div>
 
         {/* Swap Items Section - changes based on swap condition */}
-        <div className="mt-2">
-          {(swapCondition === "byBooks" || swapCondition === "byBooksOne") && (
-            <div className="flex overflow-x-auto gap-3 pb-2">
-              {swapItems?.map((item, index) => (
-                <BookCard key={index} book={item} />
-              ))}
-            </div>
+        <div className="mt-4">
+          {swapConditionType === "ByBooks" ? (
+            swapCondition?.swappableBooks.length > 0 ? (
+              swapCondition?.swappableBooks?.map((book, index) => (
+                <BookCard key={index} book={book} />
+              ))
+            ) : (
+              <SingleBookCard book={bookData} />
+            )
+          ) : (
+            ""
           )}
 
-          {swapCondition === "byGenres" && (
+          {swapConditionType === "ByGenres" && (
             <div className="flex overflow-x-auto gap-3 pb-2">
-              {genres?.map((genre, index) => (
+              {swapCondition?.swappableGenres?.map((genre, index) => (
                 <GenreCard key={index} genre={genre} />
               ))}
             </div>
           )}
 
-          {swapCondition === "openForOffers" && <OpenOfferCard />}
+          {swapConditionType === "OpenForOffers" && <OpenOfferCard />}
         </div>
       </div>
 
@@ -129,7 +102,7 @@ const BookDetails = ({ bookData }) => {
       <div className="p-4">
         <h3 className="font-medium mb-2">Book Description</h3>
         <p className="text-sm text-gray-700">
-          {displayDescription}
+          {description}
           {description?.length > 120 && (
             <button
               className="text-blue-500 ml-1"
@@ -142,32 +115,33 @@ const BookDetails = ({ bookData }) => {
       </div>
 
       {/* Book Condition and Language */}
-      <div className="p-4 border-t border-gray-200">
-        <div className="flex justify-between">
-          <div>
+      <div className="p-4  border-gray-200 bg-white">
+        <div className="flex justify-center space-x-8 divide-x-2 divide-gray-200">
+          <div className="flex flex-col items-center justify-center  gap-2 pr-8">
             <h4 className="text-sm text-gray-500 mb-1">Book Condition</h4>
-            <div className="flex items-center">
+            <div className="flex flex-col items-center gap-1">
               <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 text-gray-400"
+                width="21"
+                height="15"
+                viewBox="0 0 21 15"
                 fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+                xmlns="http://www.w3.org/2000/svg"
               >
                 <path
+                  d="M10.5 2.53142C12.0234 1.70171 12.7857 1.28571 15.0714 1.28571C16.5952 1.28571 18.119 1.70094 19.6428 2.53142V13.8571C18.1194 13.0948 17.3571 12.7143 15.0714 12.7143C13.5476 12.7143 12.0238 13.0952 10.5 13.8571M10.5 2.53142V13.8571M10.5 2.53142C8.97616 1.70094 7.45236 1.28571 5.92855 1.28571C3.64283 1.28571 2.88055 1.70171 1.35712 2.53142V13.8571C2.88093 13.0952 4.40474 12.7143 5.92855 12.7143C8.21426 12.7143 8.97655 13.0948 10.5 13.8571"
+                  stroke="black"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                 />
               </svg>
-              <span className="ml-2 text-sm">{condition}</span>
+
+              <span className="text-sm">{condition}</span>
             </div>
           </div>
 
-          <div>
+          <div className="flex flex-col">
             <h4 className="text-sm text-gray-500 mb-1">Book Language</h4>
-            <div className="flex items-center">
+            <div className="flex flex-col items-center">
               <span className="text-xl font-medium">EN</span>
               <span className="ml-2 text-sm">{language}</span>
             </div>
@@ -176,7 +150,7 @@ const BookDetails = ({ bookData }) => {
       </div>
 
       {/* Location */}
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-4  ">
         <div className="flex items-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -190,44 +164,38 @@ const BookDetails = ({ bookData }) => {
               clipRule="evenodd"
             />
           </svg>
-          <span className="ml-2 text-sm">{location}</span>
+          <span className="ml-2 text-sm">Senate Square, Helsinki</span>
         </div>
       </div>
 
       {/* Owner Info */}
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-4 ">
         <h4 className="text-sm text-gray-500 mb-2">Offered by</h4>
         <div className="flex justify-between items-center">
           <div className="flex items-center">
             <div className="w-8 h-8 bg-gray-300 rounded-full mr-2"></div>
-            <span>{owner}</span>
+            <span>{owner?.name}</span>
           </div>
           <div className="flex items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 text-green-500"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                clipRule="evenodd"
-              />
-            </svg>
-            <span className="ml-1 text-sm">
-              {positiveSwaps}% Positive Swaps
-            </span>
+            <ArrowUp className="text-green-500 size-5" />
+            <span className="ml-1 text-sm font-medium">95% Positive Swaps</span>
           </div>
         </div>
       </div>
 
       {/* More from this user */}
-      <MoreBooksSection author={author} />
+      <MoreBooksSection />
 
       {/* Request Swap Button */}
-      <div className="p-4 border-t border-gray-200">
-        <button className="w-full bg-blue-500 text-white py-3 rounded-md font-medium">
+      <div className="px-4 py-2 border-t border-gray-200 bg-white flex justify-between items-center">
+        <div>
+          <span className="text-xs text-gray-500">Offed by</span>
+          <p className="text-sm font-medium">{author}</p>
+        </div>
+        <button
+          className="bg-blue-500 text-white py-2 px-8 rounded-md font-medium"
+          onClick={() => alert("Swap request sent!")}
+        >
           Request Swap
         </button>
       </div>

@@ -1,15 +1,13 @@
+import bookImg from "../assets/icons/bookCardImg.svg";
+
 const BookCard = ({ book }) => {
   return (
-    <div className="min-w-[140px] bg-blue-50 p-3 rounded-md flex">
-      <div className="w-8 h-12 bg-gray-200 rounded mr-2 flex-shrink-0">
-        <img
-          src="/placeholder.svg?height=48&width=32"
-          alt={book.title}
-          className="w-full h-full object-cover"
-        />
+    <div className="w-full max-w-[200px] h-[110px] bg-[#DEE7F5] p-3 rounded-md flex items-center gap-2">
+      <div className="">
+        <img src={bookImg} alt={book.title} className="w-[18px] " />
       </div>
       <div className="flex-1">
-        <h4 className="text-xs font-medium line-clamp-2">{book.title}</h4>
+        <h4 className="text-sm font-medium line-clamp-2">{book.title}</h4>
         <p className="text-xs text-gray-500 mt-1">By {book.author}</p>
       </div>
     </div>
