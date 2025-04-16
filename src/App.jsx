@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import BookDetails from "./components/BookDetails";
 import "./index.css";
 import { fetchBookData } from "./libs/api";
+import Loading from "./components/ui/Loading";
 
 const HomePage = () => {
   const [bookData, setBookData] = useState(null);
@@ -26,7 +27,7 @@ const HomePage = () => {
     getBookData();
   }, []);
 
-  if (loading) return <div className="text-center">Loading...</div>;
+  if (loading) return <Loading />;
   if (error) return <div className="text-red-500 text-center">{error}</div>;
 
   return (

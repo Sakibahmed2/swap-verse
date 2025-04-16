@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+import { ArrowUp, ChevronLeft } from "lucide-react";
 import { useState } from "react";
 import bookBgImg from "../assets/book-bg.svg";
 import exchangeIcon from "../assets/icons/exchangeIcon.png";
@@ -7,7 +7,6 @@ import GenreCard from "./GenreCard";
 import MoreBooksSection from "./MoreBooksSection";
 import OpenOfferCard from "./OpenOfferCard";
 import SingleBookCard from "./SingleBookCard";
-import { ArrowUp, ChevronLeft } from "lucide-react";
 
 const BookDetails = ({ bookData }) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
@@ -27,6 +26,19 @@ const BookDetails = ({ bookData }) => {
   const [swapConditionType, setSwapConditionType] = useState(
     swapCondition?.conditionType || "ByBooks"
   );
+
+  const handleSwapConditionChange = () => {
+    const conditions = ["ByBooks", "ByGenres", "OpenForOffers"];
+
+    const newCondition = conditions.filter(
+      (condition) => condition !== swapConditionType
+    );
+
+    const randomCondition =
+      newCondition[Math.floor(Math.random() * newCondition.length)];
+
+    setSwapConditionType(randomCondition);
+  };
 
   return (
     <div className="max-w-md mx-auto bg-slate-100 min-h-screen">
@@ -66,10 +78,13 @@ const BookDetails = ({ bookData }) => {
 
       {/* Exchange Condition */}
       <div className="bg-slate-100 p-4 mt-8 ">
-        <div className="flex flex-col justify-center items-center">
+        <div
+          className="flex flex-col justify-center items-center cursor-pointer"
+          onClick={handleSwapConditionChange}
+        >
           <img src={exchangeIcon} alt="" />
           <p className="mt-2 mb-1 ">Exchange condition</p>
-          <span className="text-sm text-gray-500"></span>
+          <span className="text-sm text-gray-500">{swapConditionType}</span>
         </div>
 
         {/* Swap Items Section - changes based on swap condition */}
@@ -105,7 +120,7 @@ const BookDetails = ({ bookData }) => {
           {description}
           {description?.length > 120 && (
             <button
-              className="text-blue-500 ml-1"
+              className="text-blue-500 ml-1 cursor-pointer font-medium"
               onClick={() => setShowFullDescription(!showFullDescription)}
             >
               {showFullDescription ? "Less" : "More"}
@@ -190,7 +205,7 @@ const BookDetails = ({ bookData }) => {
       <div className="px-4 py-2 border-t border-gray-200 bg-white flex justify-between items-center">
         <div>
           <span className="text-xs text-gray-500">Offed by</span>
-          <p className="text-sm font-medium">{author}</p>
+          <p className="text-sm font-medium">{owner?.name}</p>
         </div>
         <button
           className="bg-blue-500 text-white py-2 px-8 rounded-md font-medium"
